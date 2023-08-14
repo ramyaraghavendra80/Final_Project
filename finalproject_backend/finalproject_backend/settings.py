@@ -37,9 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
+    'booking_app',
+    'rest_framework',
+    'rest_framework_simplejwt'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -48,6 +53,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ORIGIN_WHITELIST=[
+    'http://localhost:3000',
+    'http://127.0.0.1:8000'
+]
+
 
 ROOT_URLCONF = 'finalproject_backend.urls'
 
@@ -75,11 +86,20 @@ WSGI_APPLICATION = 'finalproject_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': 'Booking_app',
+        'ENFORCE_SCHEMA': False, 
+        'CLIENT':{
+            'host':'192.168.1.56',
+            'port':27017,
+            },
     }
 }
 
+SIMPLE_JWT={
+    "ACCESS_TOKEN_LIFETIME":timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME":timedelta(days=1)
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -121,3 +141,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL='booking_app.User'
+
+REST_FRAMEWORK={
+    'DEFAULT_AUTHENTICATION_CLASSES':[
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
+    ]
+}

@@ -2,16 +2,25 @@ from rest_framework import serializers
 from .models import *
 from django.contrib.auth import authenticate
 
-class MovieSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=Movie
-        fields='__all__'
-
-
 class TheaterSerializer(serializers.ModelSerializer):    
     class Meta:
         model=Theater
         fields='__all__'
+
+class MovieSerializer(serializers.ModelSerializer):
+    theaters = TheaterSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Movie
+        fields = '__all__'
+        
+class SeatSerializer(serializers.ModelSerializer):
+    theater = serializers.PrimaryKeyRelatedField(queryset=Theater.objects.all())
+    movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all())
+
+    class Meta:
+        model = Seat
+        fields = '__all__'
 
 class UserSerializer(serializers.ModelSerializer):
     password=serializers.CharField(write_only=True)

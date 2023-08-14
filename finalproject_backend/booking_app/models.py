@@ -1,8 +1,7 @@
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.db import models
 
-c+++++
-+lass UserManager(BaseUserManager):
+class UserManager(BaseUserManager):
     def create_user(self, username, password, **extra_fields):
         if not username:
             raise ValueError("Username should be provided")
@@ -41,19 +40,19 @@ class Movie(models.Model):
         return self.title
 
 class Theater(models.Model):
-    movie = models.ForeignKey(Movie,ondelete=models.CASCADE)
+    movie = models.ForeignKey(Movie,on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     pincode = models.CharField(max_length=255)
-    movie_toming = DataField()
+    movie_timing = models.DateField()
 
     def __str__(self):
         return self.name
 
 class Seat(models.Model):
-    theater = models.ForeignKey(Theater,ondelete=models.CASCADE)
-    movie = models.ForeignKey(Movie,ondelete=models.CASCADE)
+    theater = models.ForeignKey(Theater,on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie,on_delete=models.CASCADE)
     seat_number = models.CharField(max_length =10)
     is_reserved = models.BooleanField(default=False)
     price = models.FloatField(default=0.00)
@@ -62,10 +61,12 @@ class Seat(models.Model):
         return f"{self.theater.name}-{self.movie.title}- seat {self.seat_number}"
 
 class Booking(models.Model):
-    user = models.ForeignKey(User,ondelete=models.CASCADE)
-    movie = models.ForeignKey(Movie,ondelete=models.CASCADE)
-    seats = models.ManyToManyField(seat)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie,on_delete=models.CASCADE)
+    seats = models.ManyToManyField(Seat)
     total_cost = models.FloatField(default=0.00)
 
     def __str__(self):
         return f"{self.user.username} - {self.movie.title}"
+
+

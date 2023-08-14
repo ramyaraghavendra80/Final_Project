@@ -13,7 +13,7 @@ class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
         fields = '__all__'
-        
+
 class SeatSerializer(serializers.ModelSerializer):
     theater = serializers.PrimaryKeyRelatedField(queryset=Theater.objects.all())
     movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all())
@@ -21,6 +21,16 @@ class SeatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Seat
         fields = '__all__'
+
+class BookingSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all())
+    seats = serializers.PrimaryKeyRelatedField(queryset=Seat.objects.all(), many=True)
+
+    class Meta:
+        model = Booking
+        fields = '__all__'
+
 
 class UserSerializer(serializers.ModelSerializer):
     password=serializers.CharField(write_only=True)

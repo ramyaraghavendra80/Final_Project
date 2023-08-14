@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'booking_app',
     'rest_framework',
+    'rest_framework.authtoken',
     'rest_framework_simplejwt'
 ]
 
@@ -98,9 +99,13 @@ DATABASES = {
     }
 }
 
-SIMPLE_JWT={
-    "ACCESS_TOKEN_LIFETIME":timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME":timedelta(days=1)
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=1),
+    'SLIDING_TOKEN_REFRESH_LIFETIME_GRACE_PERIOD': timedelta(days=1),
+    'SLIDING_TOKEN_LIFETIME_GRACE_PERIOD': timedelta(days=1),
 }
 
 # Password validation

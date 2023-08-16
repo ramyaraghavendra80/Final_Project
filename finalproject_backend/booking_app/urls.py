@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import TheaterListView, TheaterDetailView,SignupView, SigninView, LogoutView,BookingAPI,SeatListByMovieView, SeatReservationView,TicketsAPI,FilterMovies,PaginateMovies,PaginateSearchMovies,UserDetailView, UserListView,MoviesListView, AddMovieView, UpdateMovieView, DeleteMovieView
+from .views import ReservationDetailUpdateAPIView,ReservationCreateAPIView,TheaterListView, TheaterDetailView,SignupView, SigninView, LogoutView,BookingAPI,SeatListAPIView,SeatDetailAPIView,TicketsAPI,FilterMovies,PaginateMovies,PaginateSearchMovies,UserDetailView, UserListView,MoviesListView, AddMovieView, UpdateMovieView, DeleteMovieView
 
 urlpatterns = [
     #User API
@@ -23,8 +23,10 @@ urlpatterns = [
     # Fetch all booked tickets and book a new ticket
     path('movies/tickets/', TicketsAPI.as_view(), name='tickets-api'),
     # Fetch all seats for a specific movie, reserve seats, and update seat reservation
-    path('movies/<int:movie_id>/seats/', SeatListByMovieView.as_view(), name='movie-seats-list'),
-    path('seats/reserve/', SeatReservationView.as_view(), name='reserve-seats'),     # Fetch booking summary and create a new booking
+    path('seats/', SeatListAPIView.as_view(), name='seat-list'),
+    path('seats/<int:seat_id>/', SeatDetailAPIView.as_view(), name='seat-detail'),
+    path('reservations/', ReservationCreateAPIView.as_view(), name='reservation-create'),
+    path('reservations/<int:reservation_id>/', ReservationDetailUpdateAPIView.as_view(), name='reservation-detail-update'),
     path('movies/booking/', BookingAPI.as_view(), name='booking-api'),
     #Fetch all theaters
     path('theaters/', TheaterListView.as_view(), name='theater-list'),

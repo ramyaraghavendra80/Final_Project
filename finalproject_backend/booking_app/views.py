@@ -205,43 +205,69 @@ class TicketsAPI(APIView):
             return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
 
-
-class SeatListByMovieView(APIView):
+class SeatListAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, movie_id):
-        seats = Seat.objects.filter(movie__id=movie_id)
+    def get(self, request):
+        seats = Seat.objects.filter(is_booked=False)
         serializer = SeatSerializer(seats, many=True)
-        
-        # Create a list of unreserved seat numbers
-        unreserved_seats = []
-        for seat in seats:
-            unreserved_seats.extend([seat_number for seat_number in seat.seat_numbers if seat_number not in seat.reserved_seats])
-        
-        return JsonResponse({
-            'reserved_seats': serializer.data,
-            'unreserved_seats': unreserved_seats
-        })
+        return JsonResponse(serializer.data)
 
-class SeatReservationView(APIView):
+class SeatDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
+    def get(self, request, seat_id):
+        try:
+            seat = Seat.objects.get(pk=seat_id, is_booked=False)
+            serializer = SeatSerializer(seat)
+            return JsonResponse(serializer.data)
+        except Seat.DoesNotExist:
+            return JsonResponse(status=status.HTTP_404_NOT_FOUND)
+
+class ReservationCreateAPIView(APIView):
     def post(self, request):
-        serializer = SeatSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
+        seat_ids = request.data.get('seat_ids', [])
+        user = request.user  # Use request.user if using authentication
+
+        if not seat_ids:
+            return JsonResponse({'error': 'No seats selected'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            reservations = []
+            for seat_id in seat_ids:
+                seat = Seat.objects.get(pk=seat_id, is_booked=False)
+                reservation = Reservation(seat=seat, user=user)
+                seat.is_booked = True
+                seat.save()
+                reservation.save()
+                reservations.append(reservation)
+
+            serializer = ReservationSerializer(reservations, many=True)
             return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
-        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request):
-        seat_id = request.data.get('id')
-        seat = get_object_or_404(Seat, id=seat_id)
-        
-        serializer = SeatSerializer(seat, data=request.data)
+        except Seat.DoesNotExist:
+            return JsonResponse({'error': 'Seat not found'}, status=status.HTTP_404_NOT_FOUND)
+
+class ReservationDetailUpdateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, reservation_id):
+        try:
+            return Reservation.objects.get(pk=reservation_id)
+        except Reservation.DoesNotExist:
+            raise Http404
+
+    def get(self, request, reservation_id):
+        reservation = self.get_object(reservation_id)
+        serializer = ReservationSerializer(reservation)
+        return JsonResponse(serializer.data)
+
+    def put(self, request, reservation_id):
+        reservation = self.get_object(reservation_id)
+        serializer = ReservationSerializer(reservation, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data,safe=False)
-        return JsonResponse(serializer.errors, status=400)
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class BookingAPI(APIView):
     permission_classes = [IsAuthenticated]

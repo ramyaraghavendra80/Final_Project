@@ -54,31 +54,28 @@ class Theater(models.Model):
         return self.name
 
 class Seat(models.Model):
-    theater = models.ForeignKey(Theater, on_delete=models.CASCADE)
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    seat_numbers = models.CharField(max_length=200)
-    seat_type = models.CharField(max_length=20)  # Type of the seat (e.g., Regular, Premium, etc.)
-    is_reserved = models.BooleanField(default=False)  # Reservation status
+    CATEGORY_CHOICES = [
+        ('regular', 'Regular'),
+        ('vip', 'VIP'),
+    ]
+    
+    row = models.IntegerField()
+    seat_number = models.IntegerField()
+    is_booked = models.BooleanField(default=False)
+    category = models.CharField(max_length=10, choices=CATEGORY_CHOICES, default='regular')
     price = models.FloatField(default=0.00)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    theater = models.ForeignKey(Theater, on_delete=models.CASCADE)
 
-    def __str__(self):
-        seat_numbers_str = ", ".join(self.seat_numbers)  # Uncomment this line
-        return f"{self.theater.name}-{self.movie.title} - seats: {seat_numbers_str} - type: {self.seat_type}"
-
-    # def reserve_seats(self, seat_numbers):
-    #     for seat_number in seat_numbers:
-    #         if seat_number not in self.seat_numbers:
-    #             self.seat_numbers.append(seat_number)
-    #     self.is_reserved = True
-    #     self.save()
-
-    # def unreserve_seats(self, seat_numbers):
-    #     for seat_number in seat_numbers:
-    #         if seat_number in self.seat_numbers:
-    #             self.seat_numbers.remove(seat_number)
-    #     if not self.seat_numbers:
-    #         self.is_reserved = False
-    #     self.save()
+class Reservation(models.Model):
+    STATUS_CHOICES = [
+        ('reserved', 'Reserved'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    seat = models.ForeignKey(Seat, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='reserved')
 
 class Booking(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)

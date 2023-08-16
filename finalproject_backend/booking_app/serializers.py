@@ -15,14 +15,15 @@ class MovieSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
 class SeatSerializer(serializers.ModelSerializer):
-    movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all())
-    theater = serializers.PrimaryKeyRelatedField(queryset=Theater.objects.all())
-
     class Meta:
         model = Seat
+        fields = ['id', 'row', 'seat_number', 'is_booked', 'category', 'price', 'movie', 'theater']
+
+class ReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reservation
         fields = '__all__'
-
-
+        
 class BookingSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
     movie = serializers.ReadOnlyField(source='movie.title')

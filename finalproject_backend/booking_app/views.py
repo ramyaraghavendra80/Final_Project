@@ -173,10 +173,10 @@ class FilterMovies(APIView):
         queryset = Movie.objects.all()
 
         # Apply filters if provided in the query parameters
-        genre = request.GET.get('genre')
-        language = request.GET.get('language')
-        location = request.GET.get('location')
-        rating = request.GET.get('rating')
+        genre = request.query_params.get('genre')
+        language = request.query_params.get('language')
+        location = request.query_params.get('location')
+        rating = request.query_params.get('rating')
 
         if genre:
             queryset = queryset.filter(genre=genre)
@@ -188,7 +188,7 @@ class FilterMovies(APIView):
             queryset = queryset.filter(rating=rating)
 
         serializer = MovieSerializer(queryset, many=True)
-        return JsonResponse(serializer.data, safe=False)
+        return Response(serializer.data)
 
 class TicketsAPI(APIView):
     permission_classes = [IsAuthenticated]

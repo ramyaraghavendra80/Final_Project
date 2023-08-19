@@ -5,7 +5,8 @@ import React, { useState } from 'react';
 import {BrowserRouter, Routes, Route} from "react-router-dom"
 import Login from './Components/Login/Login';
 import Signup from './Components/Signup/Signup';
-import Navbar from './Navbar';
+import Navbar from './Components/Navbar/Navbar';
+import  Home from '../src/Components/Home/Home';
 
 
 function App() {

@@ -2,8 +2,8 @@ import React from "react";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
-import "./Signup";
-import Navbar from '../Navbar/Navbar';
+import "./Signup.css";
+import Navbar from "../Navbar/Navbar";
 
 const RegistrationForm = ({ setIsRegistered }) => {
   const navigate = useNavigate();

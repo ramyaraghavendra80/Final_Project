@@ -1,43 +1,29 @@
-import './Navbar.css'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import './Navbar.css'; // Import the CSS file
 
-export default function Navbar() {
+const Navbar = () => {
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary">
-      <div className="container-fluid">
-        <a className="navbar-brand" href="/">
-          Invoice App
-        </a>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="/invoices">
-                Invoices
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="/newInvoice">
-                New Invoice
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="/login">
-                Login
-              </a>
-            </li>
-          </ul>
-        </div>
+    <nav className="navbar">
+      <div className="navbar-logo">
+        <Link to="/">Your Logo</Link>
       </div>
+      <ul className="navbar-list">
+        <li className="navbar-item">
+          <Link to="/">Home</Link>
+        </li>
+        <li className="navbar-item">
+          <Link to="/about">About</Link>
+        </li>
+        <li className="navbar-item">
+          <Link to="/services">Services</Link>
+        </li>
+        <li className="navbar-item">
+          <Link to="/contact">Contact</Link>
+        </li>
+      </ul>
     </nav>
-  )
-}
+  );
+};
+
+export default Navbar;

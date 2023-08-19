@@ -3,7 +3,7 @@ import { Formik, ErrorMessage, Field, Form } from "formik";
 import * as Yup from "yup";
 import Button from "react-bootstrap/esm/Button";
 import { Link, useNavigate } from "react-router-dom";
-import Navbar from "../Navbar/Navbar";
+import Navbar from "../Navbar";
 import { useState } from "react";
 
 function Login() {

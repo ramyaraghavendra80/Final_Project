@@ -4,7 +4,7 @@ import { useState } from "react";
 import * as Yup from "yup";
 import { Formik, ErrorMessage, Field, Form } from "formik";
 import { Link, useNavigate } from "react-router-dom";
-import Navbar from "../Navbar/Navbar";
+import Navbar from "../Navbar";
 
 function Signup() {
   const navigate = useNavigate();

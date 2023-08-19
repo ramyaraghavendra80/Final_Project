@@ -1,50 +1,79 @@
-.logincontainer{
+/* Centering content vertically and horizontally */
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+  }
+  
+  /* Styling for the login form container */
+  .login-container {
+    width: 300px;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Styling for form labels */
+  .login-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  /* Styling for form inputs */
+  .login-input {
     width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-}
-.loginform{
-    width: 400px;
-    height: 300px;
-    margin: 80px 0px 0px 0px;
-    padding: 10px 10px 10px 10px;
-    box-shadow: -1px 1px 5px black, 2px 2px 2px 2px gray;
-}
-.loginheading{
-    display: flex;
-    justify-content: center;
-    font-size: 30px;
-    color: rgb(42, 39, 39);
-}
-.loginbody{
-    margin: 10px 10px 10px 10px;
-}
-.inputfield{
-    width: 70%;
-    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
+  
+  /* Styling for error messages */
+  .error-message {
+    color: #ff0000;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  
+  /* Styling for the login button */
+  .login-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
     border: none;
-    box-shadow: -1px 1px 5px #878080, 2px 2px 2px 2px #cfc8c8;
-margin: 3px 10px 10px 30px;
-padding: 3px 3px 3px 5px;
-} 
-.loginsubmit{
-    margin: 5px 5px 10px 30px !important;
-    width: 70% !important;
-    color: black;
-    font-size: 18px !important;
-    padding: 3px 3px 3px 3px !important;
-    background-color: rgb(114, 114, 246) !important;
-}
-div.errormsg{
-color: red ;
-font-size: 10px;
-margin: 0px 0px 0px 50px !important;
-}
-.text{
-margin: 5px 5px 5px 50px !important;
-}
-.signuplink{
-    color: rgb(243, 35, 243) !important;
-}
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+  }
+  
+  .login-button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Styling for the registration link */
+  .register-link {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  /* Styling for the register button */
+  .register-button {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+  }
+  
+  .register-button:hover {
+    text-decoration: underline;
+  }
+  
 

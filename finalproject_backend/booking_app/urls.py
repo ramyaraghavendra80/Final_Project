@@ -33,3 +33,4 @@ urlpatterns = [
     path('theaters/<int:pk>/', TheaterDetailView.as_view(), name='theater-detail'),
 
 ]
+

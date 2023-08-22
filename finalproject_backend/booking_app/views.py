@@ -100,6 +100,18 @@ class MoviesListView(APIView):
         serializer = MovieSerializer(queryset, many=True)
         return JsonResponse(serializer.data, safe=False)
 
+class MovieDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, movie_id, format=None):
+        try:
+            movie = Movie.objects.get(pk=movie_id)
+        except Movie.DoesNotExist:
+            return Response({"error": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = MovieSerializer(movie)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 class AddMovieView(APIView):
     permission_classes = [IsAdminUser]
 
@@ -166,123 +178,115 @@ class PaginateSearchMovies(APIView):
             },safe=False,
             )
 
-class FilterMovies(APIView):
-    permission_classes = [IsAuthenticated]
-
+class SearchView(APIView):
     def get(self, request):
-        queryset = Movie.objects.all()
-
-        # Apply filters if provided in the query parameters
-        genre = request.query_params.get('genre')
-        language = request.query_params.get('language')
-        location = request.query_params.get('location')
-        rating = request.query_params.get('rating')
-
-        if genre:
-            queryset = queryset.filter(genre=genre)
-        if language:
-            queryset = queryset.filter(language=language)
-        if location:
-            queryset = queryset.filter(location=location)
-        if rating:
-            queryset = queryset.filter(rating=rating)
-
-        serializer = MovieSerializer(queryset, many=True)
-        return Response(serializer.data)
+        find = []
+        query = request.GET.get("query");
+        
+        movies = Movie.objects.all()  # Fetch all movies (adjust this according to your model structure)
+        
+        for val in movies:
+            if (
+                query in val.title or
+                query in val.genre or
+                query in val.language
+            ):
+                find.append(val)
+        
+        find_serialized = MovieSerializer(find, many=True).data
+        return JsonResponse(find_serialized, safe=False)
 
 class TicketsAPI(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        tickets = Booking.objects.all()
-        serializer = BookingSerializer(tickets, many=True)
-        return JsonResponse(serializer.data, safe=False)
+    def post(self, request, id):
+        try:
+            movie = Movie.objects.get(pk=id)
+        except Movie.DoesNotExist:
+            return Response({"error": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        data = request.data
+        data['movie'] = movie.id  # Set the movie reference
 
-    def post(self, request):
-        serializer = BookingSerializer(data=request.data, context={'request': request})
+        serializer = BookingSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class SeatListAPIView(APIView):
+# class SeatListAPIView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request):
+#         seats = Seat.objects.filter(is_booked=False)
+#         serializer = SeatSerializer(seats, many=True)
+#         return JsonResponse(serializer.data)
+
+class SeatSelectionConfirmAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        seats = Seat.objects.filter(is_booked=False)
-        serializer = SeatSerializer(seats, many=True)
-        return JsonResponse(serializer.data)
-
-class SeatDetailAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, seat_id):
+    def post(self, request, movie_id, format=None):
         try:
-            seat = Seat.objects.get(pk=seat_id, is_booked=False)
-            serializer = SeatSerializer(seat)
-            return JsonResponse(serializer.data)
-        except Seat.DoesNotExist:
-            return JsonResponse(status=status.HTTP_404_NOT_FOUND)
+            movie = Movie.objects.get(pk=movie_id)
+        except Movie.DoesNotExist:
+            return Response({"error": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
 
-class ReservationCreateAPIView(APIView):
-    def post(self, request):
-        seat_ids = request.data.get('seat_ids', [])
-        user = request.user  # Use request.user if using authentication
-
-        if not seat_ids:
-            return JsonResponse({'error': 'No seats selected'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            reservations = []
-            for seat_id in seat_ids:
-                seat = Seat.objects.get(pk=seat_id, is_booked=False)
-                reservation = Reservation(seat=seat, user=user)
-                seat.is_booked = True
-                seat.save()
-                reservation.save()
-                reservations.append(reservation)
-
-            serializer = ReservationSerializer(reservations, many=True)
-            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
-        except Seat.DoesNotExist:
-            return JsonResponse({'error': 'Seat not found'}, status=status.HTTP_404_NOT_FOUND)
-
-class ReservationDetailUpdateAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self, reservation_id):
-        try:
-            return Reservation.objects.get(pk=reservation_id)
-        except Reservation.DoesNotExist:
-            raise Http404
-
-    def get(self, request, reservation_id):
-        reservation = self.get_object(reservation_id)
-        serializer = ReservationSerializer(reservation)
-        return JsonResponse(serializer.data)
-
-    def put(self, request, reservation_id):
-        reservation = self.get_object(reservation_id)
-        serializer = ReservationSerializer(reservation, data=request.data)
+        selected_seats = request.data.get('selected_seats')
+        selected_category = request.data.get('selected_category')
+        selected_date = request.data.get('selected_date')
+        selected_time = request.data.get('selected_time')
+        selected_theater = request.data.get('selected_theater')
+        
+        # Calculate total price based on selected seats and category
+        price_per_seat = 0
+        if selected_category == 'VIP':
+            price_per_seat = 15  # Example VIP price
+        elif selected_category == 'Balcony':
+            price_per_seat = 10  # Example Balcony price
+        else:
+            price_per_seat = 8  # Example Standard price
+        total_price = len(selected_seats) * price_per_seat
+        
+        booking_data = {
+            'movie': movie.id,
+            'date': selected_date,
+            'time': selected_time,
+            'theater': selected_theater,
+            'selected_seats': selected_seats,
+            'selected_category': selected_category,
+            'total_price': total_price
+        }
+        
+        serializer = BookingSerializer(data=booking_data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class BookingAPI(APIView):
+class BookingCreateView(APIView):
     permission_classes = [IsAuthenticated]
+    
+    def post(self, request, movie_id, format=None):
+        try:
+            movie = Movie.objects.get(pk=movie_id)
+        except Movie.DoesNotExist:
+            return Response({"error": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    def get(self, request):
-        bookings = Booking.objects.filter(user=request.user)
-        serializer = BookingSerializer(bookings, many=True)
-        return JsonResponse(serializer.data, safe=False)
+        data = {
+            'movie': movie.id,
+            'date': request.data.get('date'),
+            'time': request.data.get('time'),
+            'theater': request.data.get('theater')
+        }
 
-    def post(self, request):
-        serializer = BookingSerializer(data=request.data)
+        serializer = BookingSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(user=request.user)
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RefreshTokenView(APIView):
     def post(self, request):

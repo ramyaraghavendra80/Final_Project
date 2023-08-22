@@ -33,14 +33,28 @@ class User(AbstractBaseUser):
         
 class Movie(models.Model):
     title = models.CharField(max_length=255)
-    director = models.CharField(max_length =255)
-    genre = models.CharField(max_length =255)
-    language = models.CharField(max_length =255)
-    rating = models.CharField(max_length =10)
-    movie_length = models.IntegerField()
+    genre = models.CharField(max_length=100)
+    language = models.CharField(max_length=50)
+    rating = models.CharField(max_length=10)
+    image = models.ImageField(upload_to='movie_images/')
+    director = models.CharField(max_length=255)
+    movie_length = models.PositiveIntegerField()
 
     def __str__(self):
         return self.title
+
+class Booking(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    date = models.DateField()
+    time = models.TimeField()
+    theater = models.CharField(max_length=100)
+    selected_category = models.CharField(max_length=50)
+    selected_seats = models.JSONField()
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f'{self.movie.title} - {self.user.username}'
 
 class Theater(models.Model):
     movie = models.ForeignKey(Movie,on_delete=models.CASCADE)
@@ -53,38 +67,21 @@ class Theater(models.Model):
     def __str__(self):
         return self.name
 
-class Seat(models.Model):
-    CATEGORY_CHOICES = [
-        ('regular', 'Regular'),
-        ('vip', 'VIP'),
-    ]
+# class Seat(models.Model):
+#     CATEGORY_CHOICES = [
+#         ('regular', 'Regular'),
+#         ('vip', 'VIP'),
+#     ]
     
-    row = models.IntegerField()
-    seat_number = models.IntegerField()
-    is_booked = models.BooleanField(default=False)
-    category = models.CharField(max_length=10, choices=CATEGORY_CHOICES, default='regular')
-    price = models.FloatField(default=0.00)
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    theater = models.ForeignKey(Theater, on_delete=models.CASCADE)
+#     row = models.IntegerField()
+#     seat_number = models.IntegerField()
+#     is_booked = models.BooleanField(default=False)
+#     category = models.CharField(max_length=10, choices=CATEGORY_CHOICES, default='regular')
+#     price = models.FloatField(default=0.00)
+#     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+#     theater = models.ForeignKey(Theater, on_delete=models.CASCADE)
 
-class Reservation(models.Model):
-    STATUS_CHOICES = [
-        ('reserved', 'Reserved'),
-        ('cancelled', 'Cancelled'),
-    ]
-    
-    seat = models.ForeignKey(Seat, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='reserved')
 
-class Booking(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
-    movie = models.ForeignKey(Movie,on_delete=models.CASCADE)
-    seats = models.ManyToManyField(Seat)
-    total_cost = models.FloatField(default=0.00)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.movie.title}"
 
 
 

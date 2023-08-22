@@ -1,0 +1,21 @@
+.movie-card {
+    display: flex;
+    align-items: center;
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .movie-card img {
+    max-width: 200px;
+    height: auto;
+    margin-right: 20px;
+  }
+  
+  .movie-details {
+    display: flex;
+    flex-direction: column;
+  }
+  

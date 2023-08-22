@@ -14,38 +14,11 @@ class MovieSerializer(serializers.ModelSerializer):
         model = Movie
         fields = '__all__'
     
-class SeatSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Seat
-        fields = ['id', 'row', 'seat_number', 'is_booked', 'category', 'price', 'movie', 'theater']
-
-class ReservationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Reservation
-        fields = '__all__'
-        
-class BookingSerializer(serializers.ModelSerializer):
-    user = serializers.ReadOnlyField(source='user.username')
-    movie = serializers.ReadOnlyField(source='movie.title')
-    seats = serializers.StringRelatedField(many=True, read_only=True) 
+# class SeatSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Seat
+#         fields = ['id', 'row', 'seat_number', 'is_booked', 'category', 'price', 'movie', 'theater']
     
-    class Meta:
-        model = Booking
-        fields = '__all__'
-
-    def create(self, validated_data):
-        seats_data = validated_data.pop('seats', [])
-        movie_id = validated_data.get('movie', None)  # Get movie ID from the request data
-
-        booking = Booking.objects.create(user=self.context['request'].user,movie_id=movie_id,**validated_data)
-        
-        booking.save()
-
-        for seat_data in seats_data:
-            booking.seats.add(seat_data)
-        return booking
-
-
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     is_admin = serializers.BooleanField(default=False)  # Add is_admin field

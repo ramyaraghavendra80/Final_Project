@@ -1,22 +1,17 @@
 .navbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: left;
     align-items: center;
-    background: linear-gradient(
-      to right,
-      rgb(251, 128, 12) 0%,
-      white 50%,
-      rgb(13, 246, 75) 100%
-    );
+    background: rgb(2, 2, 112);
     color: #fff;
     padding: 10px 20px;
   }
   
   
   .navbar-logo a {
-    font-size: 24px;
+    font-size: 30px;
     text-decoration: none;
-    color: aliceblue;
+    color: rgb(243, 245, 246);
     font-family: 'Wavefont', cursive;
   }
   
@@ -24,14 +19,15 @@
     list-style: none;
     display: flex;
     gap: 20px;
+    font-size: 20px;
   }
   
   .navbar-item a {
-    color: #fff;
+    color: rgb(238, 243, 247);
     text-decoration: none;
   }
   
   .navbar-item a:hover {
-    text-decoration: underline;
+    text-decoration: rgb(104, 239, 37);
   }
   

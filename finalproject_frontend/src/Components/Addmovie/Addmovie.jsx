@@ -1,58 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 function AddMovie() {
-  const [title, setTitle] = useState('');
-  const [genre, setGenre] = useState('');
-  const [year, setYear] = useState('');
-  const [image, setImage] = useState('');
-  const [director, setDirector] = useState('');
-  const [length, setLength] = useState('');
-  const [language, setLanguage] = useState('');
+  const [title, setTitle] = useState("");
+  const [genre, setGenre] = useState("");
+  const [year, setYear] = useState("");
+  const [image, setImage] = useState("");
+  const [director, setDirector] = useState("");
+  const [length, setLength] = useState("");
+  const [language, setLanguage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newMovie = {
-      title,
-      genre,
-      year,
-      image,
-      director,
-      length,
-      language,
-    };
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("genre", genre);
+    formData.append("year", year);
+    formData.append("director", director);
+    formData.append("length", length);
+    formData.append("language", language);
+    formData.append("image", image);
 
     try {
-      const response = await fetch('https://api.example.com/movies', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newMovie),
+      const response = await fetch("https://api.example.com/movies", {
+        method: "POST",
+        body: formData, // Use the FormData object
       });
 
       if (response.ok) {
-        console.log('Movie added successfully');
+        alert("Movie added successfully");
         // Clear the form after successful submission
-        setTitle('');
-        setGenre('');
-        setYear('');
-        setImage('');
-        setDirector('');
-        setLength('');
-        setLanguage('');
+        setTitle("");
+        setGenre("");
+        setYear("");
+        setImage("");
+        setDirector("");
+        setLength("");
+        setLanguage("");
       } else {
-        console.error('Failed to add movie');
+        console.error("Failed to add movie");
       }
     } catch (error) {
-      console.error('An error occurred', error);
+      console.error("An error occurred", error);
     }
   };
 
   return (
     <div>
       <h2>Add a Movie</h2>
-      <form onSubmit={handleSubmit}>
+      <form action="/upload" method="post" enctype="multipart/form-data" onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="Title"
@@ -72,10 +68,10 @@ function AddMovie() {
           onChange={(e) => setYear(e.target.value)}
         />
         <input
-          type="text"
-          placeholder="Image URL"
-          value={image}
-          onChange={(e) => setImage(e.target.value)}
+          type="file"
+          name="image"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files[0])}
         />
         <input
           type="text"

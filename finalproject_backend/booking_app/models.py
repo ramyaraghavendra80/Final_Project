@@ -1,7 +1,9 @@
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.db import models
-# from django.contrib.postgres.fields import ArrayField
-
+from datetime import date
+import datetime
+from django.contrib.postgres.fields import ArrayField  # Use ArrayField for PostgreSQL
+from django.utils import timezone
 
 class UserManager(BaseUserManager):
     def create_user(self, username, password, **extra_fields):
@@ -30,34 +32,8 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.username
-        
-class Movie(models.Model):
-    title = models.CharField(max_length=255)
-    genre = models.CharField(max_length=100)
-    language = models.CharField(max_length=50)
-    rating = models.CharField(max_length=10)
-    image = models.ImageField(upload_to='movie_images/')
-    director = models.CharField(max_length=255)
-    movie_length = models.PositiveIntegerField()
-
-    def __str__(self):
-        return self.title
-
-class Booking(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    date = models.DateField()
-    time = models.TimeField()
-    theater = models.CharField(max_length=100)
-    selected_category = models.CharField(max_length=50)
-    selected_seats = models.JSONField()
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return f'{self.movie.title} - {self.user.username}'
 
 class Theater(models.Model):
-    movie = models.ForeignKey(Movie,on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
@@ -67,21 +43,71 @@ class Theater(models.Model):
     def __str__(self):
         return self.name
 
-# class Seat(models.Model):
-#     CATEGORY_CHOICES = [
-#         ('regular', 'Regular'),
-#         ('vip', 'VIP'),
-#     ]
-    
-#     row = models.IntegerField()
-#     seat_number = models.IntegerField()
-#     is_booked = models.BooleanField(default=False)
-#     category = models.CharField(max_length=10, choices=CATEGORY_CHOICES, default='regular')
-#     price = models.FloatField(default=0.00)
-#     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-#     theater = models.ForeignKey(Theater, on_delete=models.CASCADE)
+class Movie(models.Model):
+    title = models.CharField(max_length=255)
+    genre = models.CharField(max_length=100)
+    language = models.CharField(max_length=50)
+    rating = models.CharField(max_length=10)
+    image = models.TextField()
+    director = models.CharField(max_length=255)
+    movie_length = models.PositiveIntegerField()
+    year = models.DateField(default=datetime.date.today)
+    theater = models.ForeignKey(Theater, on_delete=models.CASCADE,blank=True,null=True,related_name='movies')
 
+    def __str__(self):
+        return self.title
 
+class Seat(models.Model):
+    seat_number = models.CharField(max_length=10, unique=True)
+    is_booked = models.BooleanField(default=False)
+    category = models.CharField(max_length=20)  # Category of the seat (e.g., "Standard", "VIP", "Balcony")
+    price = models.DecimalField(max_digits=10, decimal_places=2)  # Price of the seat
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    date = models.DateField(default=timezone.now)
+    time = models.TimeField(default=timezone.now().time())
+    theater = models.ForeignKey(Theater, on_delete=models.CASCADE, default=None, blank=True, null=True)
 
+    def __str__(self):
+        return f"Seat {self.seat_number} ({self.category}) - {self.movie.title} at {self.theater.name}"
 
+    def clean(self):
+        # Ensure that seat_number is unique for a specific movie, theater, date, and time
+        existing_seats = Seat.objects.filter(
+            movie=self.movie,
+            theater=self.theater,
+            date=self.date,
+            time=self.time,
+            seat_number=self.seat_number,
+        ).exclude(pk=self.pk)  # Exclude the current instance when checking for duplicates
 
+        if existing_seats.exists():
+            raise ValidationError({'seat_number': _('Seat already exists for this movie, theater, date, and time.')})
+
+class Booking(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Associate with a user
+    seat_numbers = models.CharField(max_length=255)
+    date = models.DateField()
+    time = models.TimeField()
+    movie_name = models.CharField(max_length=255)
+    theater_name = models.CharField(max_length=255)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+class Ticket(models.Model):
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
+    seat_number = models.CharField(max_length=10)
+    date = models.DateField()
+    time = models.TimeField()
+    movie_name = models.CharField(max_length=255)
+    theater_name = models.CharField(max_length=255)
+    total_price = models.CharField(max_length=255)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tickets')
+
+    def save(self, *args, **kwargs):
+        # Automatically populate ticket fields from the associated booking
+        self.date = self.booking.date
+        self.time = self.booking.time
+        self.movie_name = self.booking.movie_name
+        self.theater_name = self.booking.theater_name
+        self.total_price = self.booking.total_price
+        self.seat_number = self.booking.seat_numbers
+        super().save(*args, **kwargs)

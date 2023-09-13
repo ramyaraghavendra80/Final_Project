@@ -2,23 +2,36 @@ from rest_framework import serializers
 from .models import *
 from django.contrib.auth import authenticate
 
-class TheaterSerializer(serializers.ModelSerializer):    
+class SeatSerializer(serializers.ModelSerializer):
     class Meta:
-        model=Theater
-        fields='__all__'
+        model = Seat
+        fields = '__all__'
 
 class MovieSerializer(serializers.ModelSerializer):
-    theaters = TheaterSerializer(many=True, read_only=True)
-
+  
     class Meta:
         model = Movie
         fields = '__all__'
+
+class TheaterSerializer(serializers.ModelSerializer):  
+    movies = MovieSerializer(many=True, read_only=True)
+  
+    class Meta:
+        model=Theater
+        fields='__all__'
     
-# class SeatSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Seat
-#         fields = ['id', 'row', 'seat_number', 'is_booked', 'category', 'price', 'movie', 'theater']
-    
+class BookingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        fields = '__all__'
+
+class TicketSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        model = Ticket
+        exclude = ['booking']
+        
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     is_admin = serializers.BooleanField(default=False)  # Add is_admin field

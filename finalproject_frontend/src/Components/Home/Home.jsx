@@ -1,6 +1,7 @@
 import React from "react";
 import "./Home.css";
 import MovieSearch from "../Moviesearch/Moviesearch";
+import Movies from  "../Movies/Movies";
 
 function Home() {
   return (
@@ -16,6 +17,9 @@ function Home() {
         <h4>What are you looking for</h4>
         <div className="second-container">
           <MovieSearch/>
+        </div>
+        <div>
+          <Movies/>
         </div>
       </div>
     </div>

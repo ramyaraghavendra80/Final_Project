@@ -21,10 +21,24 @@
     gap: 20px;
     font-size: 20px;
   }
+  .navbar-list-right{
+    list-style: none;
+    display: flex;
+    justify-content: right;
+    gap: 20px;
+    font-size: 20px;
+    margin: 0px 0px 0px 600px;
+  }
   
   .navbar-item a {
     color: rgb(238, 243, 247);
     text-decoration: none;
+  }
+  .logout{
+    color: rgb(238, 243, 247);
+    text-decoration: none;
+    background-color: transparent !important;
+    font-size: 20px;
   }
   
   .navbar-item a:hover {

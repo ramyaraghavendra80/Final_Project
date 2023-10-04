@@ -1,26 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import "./Movies.css";
+import { Link } from "react-router-dom";
 
-const Movies = () => {
-  const [movies, setMovies] = useState([]);
-
-  useEffect(() => {
-    // Fetch movie data from an API or a local JSON file
-    fetch('/api/movies') // Replace with your API endpoint
-      .then(response => response.json())
-      .then(data => setMovies(data))
-      .catch(error => console.error('Error fetching movies:', error));
-  }, []);
+const Movies = ({ movie }) => {
+  const movieDetailLink = `/movies/${movie.id}/`;
 
   return (
-    <div className="app">
-      {movies.map((movie, index) => (
-        <div className="movie-card" key={index}>
-          <img className="movie-image" src={movie.image} alt={movie.title} />
-          <h2 className="movie-title">{movie.title}</h2>
-        </div>
-      ))}
-    </div>
+    <Link to={movieDetailLink} className="moviecard">
+      <img className="movieimage" src={movie.image} alt={movie.title} />
+      <hr />
+      <div class="card-body">
+        <p className="movietitle">{movie.title}</p>
+      </div>
+    </Link>
   );
+  
 };
 
 export default Movies;

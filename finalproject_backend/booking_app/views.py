@@ -73,7 +73,8 @@ class SigninView(APIView):
                 'message': 'Login successful',
                 'user_id': user.id,
                 'refresh_token': str(refresh),
-                'access_token': str(access_token)
+                'access_token': str(access_token),
+                'username':user.username
             })
 
         return JsonResponse({'message': 'Incorrect credentials'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -86,6 +87,7 @@ class LogoutView(APIView):
         return JsonResponse({'message': 'Logged out successfully'})
 
 class MovieList(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         queryset = Movie.objects.all()
         genre = request.query_params.get('genre')
@@ -105,47 +107,58 @@ class MovieList(APIView):
         serializer = MovieSerializer(queryset, many=True)
         return Response(serializer.data)
 
-class MovieDetail(APIView):
-    permission_classes = [IsAuthenticated]
-    
-    def get(self, request, movie_id, format=None):
-        try:
-            movie = Movie.objects.get(pk=movie_id)
-        except Movie.DoesNotExist:
-            return Response({"error": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = MovieSerializer(movie)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-class AddMovieView(APIView):
-    permission_classes = [IsAuthenticated,IsAdminUser]
-
     def post(self, request):
         serializer = MovieSerializer(data=request.data)
+
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
-        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class UpdateMovieView(APIView):
-    permission_classes = [IsAdminUser]
+class MovieDetail(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get_movie(self, movie_id):
+        try:
+            return Movie.objects.get(id=movie_id)
+        except Movie.DoesNotExist:
+            return None
 
-    def put(self, request, pk):
-        movie = Movie.objects.get(pk=pk)
-        serializer = MovieSerializer(movie, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, movie_id):
+        movie = self.get_movie(movie_id)
+        if movie is not None:
+            serializer = MovieSerializer(movie)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({'detail': 'Movie not found'}, status=status.HTTP_404_NOT_FOUND)
 
-class DeleteMovieView(APIView):
-    permission_classes = [IsAdminUser]
+    def put(self, request, movie_id):
+        movie = self.get_movie(movie_id)
+        if movie is not None:
+            serializer = MovieSerializer(movie, data=request.data, partial=True)
+            if serializer.is_valid():
+                # Update other fields of the movie
+                serializer.save()
 
-    def delete(self, request, pk):
-        movie = Movie.objects.get(pk=pk)
-        movie.delete()
-        return JsonResponse({'message': 'Movie deleted successfully'})
+                # Update theaters associated with the movie
+                if 'theater' in request.data:
+                    theater_ids = request.data['theater']
+                    movie.theater.add(*theater_ids)  # Add new theater IDs
+
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'detail': 'Movie not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, movie_id):
+        movie = self.get_movie(movie_id)
+        if movie is not None:
+            movie.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'detail': 'Movie not found'}, status=status.HTTP_404_NOT_FOUND)
 
 class PaginateMovies(APIView):
     permission_classes = [IsAuthenticated]
@@ -204,21 +217,10 @@ class SearchView(APIView):
 
 class TicketList(APIView):
     permission_classes = [IsAuthenticated]
-    def get(self, request, booking_id):
-        # Retrieve booking data using the booking_id from the URL
-        booking = get_object_or_404(Booking, pk=booking_id)
-
-        # Ensure that the booking belongs to the current user
-        if booking.user != request.user:
-            return Response({"error": "You do not have permission to view tickets for this booking."},
-                            status=status.HTTP_403_FORBIDDEN)
-
-        # Retrieve a list of tickets associated with the booking
-        tickets = Ticket.objects.filter(booking=booking)
-
-        # Serialize the list of tickets
+    
+    def get(self, request):
+        tickets = Ticket.objects.all()
         serializer = TicketSerializer(tickets, many=True)
-
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -235,7 +237,7 @@ class TicketList(APIView):
         try:
             ticket = Ticket.objects.create(
                 booking=booking,
-                seat_number=booking.seat_numbers,
+                seat_number=booking.seat_number,
                 user=request.user
             )
         except Seat.DoesNotExist:
@@ -279,7 +281,7 @@ class SeatList(APIView):
             theater = movie.theater
 
         try:
-            seat = Seat.objects.get(movie=movie, seat_number=seat_number)
+            seat = Seat.objects.get(movie=movie, seat_number=seat_number,theater=theater)
         except Seat.DoesNotExist:
             seat = Seat(
                 seat_number=seat_number,
@@ -304,25 +306,26 @@ class SeatList(APIView):
 
         # Calculate the price based on the selected category and multiply by the total number of seats
         total_price = self.calculate_seat_price(category) * total_seats
+        # theater = Theater.objects.get(pk=theater_id)
 
         # After successfully booking the seats, prepare the data dictionary
         booking_data = {
-            "seat_numbers": seat_number,  
+            "seat_number": seat_number,  
             "date": date,
             "time": time,
-            "movie_name": movie.title,
-            "theater_name": theater.name,
-            "total_price": str(total_price),
+            "movie": movie.title,
+            "theater": theater,
+            "price": str(total_price),
         }
 
         # Create a new Booking instance with the booking_data
         booking = Booking.objects.create(
-            seat_numbers=booking_data["seat_numbers"],
+            seat_number=booking_data["seat_number"],
             date=booking_data["date"],
             time=booking_data["time"],
-            movie_name=booking_data["movie_name"],
-            theater_name=booking_data["theater_name"],
-            total_price=booking_data["total_price"],
+            movie=booking_data["movie"],
+            theater=booking_data["theater"],
+            price=booking_data["price"],
             user=request.user  # Associate the booking with the logged-in user
         )
 
@@ -332,7 +335,7 @@ class SeatList(APIView):
         # Return a success message to the user
         success_message = "Seat reservation and booking have been successful."
 
-        return Response({"message": success_message, "booking_id": booking.id}, status=status.HTTP_201_CREATED)
+        return Response({"message": success_message, "booking_id": booking.id,"total_price": total_price}, status=status.HTTP_201_CREATED)
             
     def put(self, request, seat_id):
         try:
@@ -359,6 +362,8 @@ class SeatList(APIView):
         return price_mapping.get(category, Decimal('8.00'))
 
 class BookingConfirmation(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, booking_id):
         # Retrieve the booking instance or return a 404 error if not found
         booking = get_object_or_404(Booking, pk=booking_id)
@@ -368,7 +373,22 @@ class BookingConfirmation(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def post(self, request):
+        # Access the authenticated user
+        user = request.user
+
+        serializer = BookingSerializer(data=request.data)
+        if serializer.is_valid():
+            # Create the booking instance and set the user
+            booking = serializer.save(user=user)
+
+            response_data = {'booking_id': booking.id}
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class TheaterListView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         theaters = Theater.objects.all()
         serializer = TheaterSerializer(theaters, many=True)
@@ -382,6 +402,8 @@ class TheaterListView(APIView):
         return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TheaterDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get_object(self, pk):
         try:
             return Theater.objects.get(pk=pk)

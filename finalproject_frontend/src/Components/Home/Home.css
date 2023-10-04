@@ -2,51 +2,31 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+   height: 100%;
   }
 
-  .container {
-    width: 100%;
-    margin:0 auto;
-    padding: 20px;
+  .homecontainer{
+    display: flex;
     height: 100%;
-    color: #111016;
+    width: 100%;
+    /* background-color: rgb(139, 180, 180); */
+    flex-direction: column; 
+    background-size: cover;
+  }
+
+  .top-container {
+    width: 100%;
+    padding: 20px;
+    flex: 0; 
+    color: #221347;
+    border-bottom: 1px solid rgb(63, 47, 245);
   } 
   
-  .filter-container {
-    background-image: url(C:\Users\ramya\Final_Project\finalproject_frontend\src\Components\Images\images17.jpg);
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    border-radius: 8px;
+  .bottom-container {
+    width: 100%;
     padding: 20px;
-    width: 600px;
-    height: 300px;
-    margin: 0px !important;
-    padding: 10px 10px 10px 10px;
-    box-shadow: -1px 1px 5px rgb(25, 3, 107), 2px 2px 333px 0px rgb(8, 1, 119);
-    position:relative;
-    left: 8em;     
-    color: #fff;
-  }
-  /* .second-container{
-    background-color: rgb(3, 3, 67);
-    height: 100px;
-    padding: 10px;
-    margin: 10px;
-  } */
-  h4{
-margin: 1em !important;
-display: flex;
-justify-content: left;
-font-style: oblique;
-  }
-  h6{
-    margin: 1em !important;
-    display: flex;
-    justify-content: left;
-    font-style: oblique;
-      }
-  .movie-list-container {
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 20px;
+    /* height: 97%; */
+    color: #221347;
+    flex: 1; 
+    flex-direction: row; 
   }

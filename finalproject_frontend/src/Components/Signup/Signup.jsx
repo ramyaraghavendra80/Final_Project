@@ -18,7 +18,7 @@ function Signup() {
     console.log(values);
     props.resetForm();
     console.log(props);
-    fetch("http://127.0.0.1:8000/project/user/signup/", {
+    fetch("http://127.0.0.1:8000/project/signup/", {
       method: "POST",
       body: JSON.stringify(values),
       headers: {
@@ -63,9 +63,7 @@ function Signup() {
           <div className="container">
             <div className="signupcontainer">
               <Form className="signupform">
-                <p className="signupheading">
-                  Sign Up<p className="info">To create invoices...</p>
-                </p>
+                <p className="signupheading">SignUp</p>
                 <hr />
                 <div className="signupbody">
                   <div className="form-row">
@@ -135,6 +133,10 @@ function Signup() {
                       className="errormsg"
                       name="username"
                     />
+                  </div>
+                  <div className="check-box">
+                  <Field type="checkbox" name="is_staff" />
+                    <label htmlFor="is_staff">Are you a staff ?</label>
                   </div>
                   <div>
                     <p className="text">

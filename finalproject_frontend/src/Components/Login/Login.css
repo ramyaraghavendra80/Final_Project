@@ -1,12 +1,9 @@
-/* .logincontainer{ */
-  /* width: 100%;
-  height: 100%; */
-  /* display: flex;
-  justify-content: center;
-} */
+.login-container{
+  margin: 80px 0px 0px 420px;
+}
 .loginform{
   width: 400px;
-  height: 300px;
+  height: 330px;
   margin: 30px 0px 0px 0px;
   padding: 10px 10px 10px 10px;
   /* box-shadow: -1px 1px 5px black, 2px 2px 2px 2px gray; */
@@ -16,17 +13,17 @@
     border-radius: 8px;
     /* padding: 20px; */
     box-shadow: -1px 1px 5px rgb(25, 3, 107), 2px 2px 333px 0px rgb(8, 1, 119);
-    color: #fff;
+    color: #f4f009;
   }
 
 .loginheading{
   display: flex;
   justify-content: center;
   font-size: 30px;
-  color: rgb(42, 39, 39);
+  color: rgb(18, 238, 77);
 }
 .loginbody{
-  margin: 10px 10px 10px 10px;
+  margin: 18px 10px 10px 50px;
 }
 .inputfield{
   width: 70%;
@@ -39,12 +36,14 @@ padding: 3px 3px 3px 5px;
 .loginsubmit{
   margin: 5px 5px 10px 30px !important;
   width: 70% !important;
-  color: black;
+  color: rgb(8, 19, 242);
   font-size: 18px !important;
   padding: 3px 3px 3px 3px !important;
-  background-color: rgb(114, 114, 246) !important;
+  background-color: rgb(200, 200, 251) !important;
+  border-radius: 8px;
+
 }
-div.errormsg{
+.errormsg{
 color: red ;
 font-size: 10px;
 margin: 0px 0px 0px 50px !important;

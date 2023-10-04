@@ -1,0 +1,11 @@
+.filter-row{
+    display: flex;
+    flex-direction: row; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 2px 50px;
+  } 
+h2{
+margin: 40px;
+}
+  

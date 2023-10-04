@@ -7,22 +7,16 @@ class SeatSerializer(serializers.ModelSerializer):
         model = Seat
         fields = '__all__'
 
-class MovieSerializer(serializers.ModelSerializer):
-  
+class TheaterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Movie
+        model = Theater
         fields = '__all__'
 
-class TheaterSerializer(serializers.ModelSerializer):  
-    movies = MovieSerializer(many=True, read_only=True)
-  
+class MovieSerializer(serializers.ModelSerializer):
+    theater = TheaterSerializer(many=True, read_only=True)
+
     class Meta:
-        model=Theater
-        fields='__all__'
-    
-class BookingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Booking
+        model = Movie
         fields = '__all__'
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -31,11 +25,19 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         exclude = ['booking']
+
+class BookingSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
+    
+    class Meta:
+        model = Booking
+        fields = '__all__'
         
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     is_admin = serializers.BooleanField(default=False)  # Add is_admin field
-    
+    # bookings = BookingSerializer(many=True, read_only=True)
+
     class Meta:
         model = User
         fields = ('username', 'password', 'email', 'name', 'is_admin')
@@ -62,3 +64,4 @@ class LoginSerializer(serializers.Serializer):
         if user and user.is_active:
             return user
         raise serializers.ValidationError("Incorrect credentials")
+

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './Navbar.css';
+import React from "react";
+import { Link } from "react-router-dom";
+import "./Navbar.css";
 
 const Navbar = ({ isAuthenticated, onLogout }) => {
   return (
@@ -12,15 +12,21 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
         <li className="navbar-item">
           <Link to="/">Home</Link>
         </li>
-        {isAuthenticated ? (
-          <li className="navbar-item">
-            <button onClick={onLogout}>Logout</button>
-          </li>
-        ) : (
-          <li className="navbar-item">
+        <li className="navbar-item">
+          {isAuthenticated ? (
+            <button className="logout" onClick={onLogout}>Logout</button>
+          ) : (
             <Link to="/login">Login</Link>
-          </li>
-        )}
+          )}
+        </li>
+      </ul>
+      <ul className="navbar-list-right">
+        <li className="navbar-item">
+          <Link to="/tickets">Tickets</Link>
+        </li>
+        <li className="navbar-item">
+          <Link to="/signup">SignUp</Link>
+        </li>
       </ul>
     </nav>
   );

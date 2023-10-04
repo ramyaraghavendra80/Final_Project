@@ -1,120 +1,119 @@
-import "./Login.css";
-import { Formik, ErrorMessage, Field, Form } from "formik";
+// Login.js
+import React, { useState } from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import Button from "react-bootstrap/esm/Button";
-import Navbar from "../Navbar/Navbar";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
-
-function Login() {
+import "./Login.css";
+function Login({ onLogin }) {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   const initialValues = {
     username: "",
     password: "",
   };
 
-  const submitForm = async (values) => {
+  const validationSchema = Yup.object().shape({
+    username: Yup.string().required("Username is required"),
+    password: Yup.string().required("Password is required"),
+  });
+
+  const handleSubmit = async (values) => {
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const res = await fetch("http://127.0.0.1:8000/project/signin/", {
+      const response = await fetch(`http://127.0.0.1:8000/project/signin/`, {
         method: "POST",
-        body: JSON.stringify(values),
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify(values),
       });
 
-      const data = await res.json();
-      console.log(data);
-      if (data?.access) {
-        localStorage.setItem("access", data.access);
+      if (response.ok) {
+        const data = await response.json();
+        const accessToken = data.access_token;
+        const username = data.username;
+
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("username", username);
+
+        // Trigger the parent component's login function
+        onLogin();
         navigate("/");
       } else {
-        alert("Login Credentials are not matching..!");
+        setError("Login failed. Please check your credentials.");
       }
     } catch (error) {
-      console.error("Login unsuccesfull...!", error);
+      console.error("Login failed:", error);
+      setError("An error occurred during login. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
-  const LoginSchema = Yup.object().shape({
-    username: Yup.string().required("username is required"),
-    password: Yup.string().required("Password is required"),
-    // .min(6, "Password is too short - should be 6 chars minimum"),
-  });
 
   return (
-    <Formik
-      initialValues={initialValues}
-      validationSchema={LoginSchema}
-      onSubmit={submitForm}
-    >
-      {(formik) => {
-        const { errors, touched } = formik;
-        return (
-          <>
-            <div className="logincontainer">
-              <Form className="loginform">
-              <p className="loginheading">Movie Time Enjoy</p>
-                <p className="loginheading">Login</p>
-                <hr />
-                <div className="loginbody">
-                  <div className="form-row">
-                    <Field
-                      type="username"
-                      name="username"
-                      id="username"
-                      placeholder="Enter username"
-                      className={`inputfield ${
-                        errors.username && touched.username
-                          ? "input-error"
-                          : null
-                      }`}
-                    />
-                    <ErrorMessage
-                      name="username"
-                      className="errormsg"
-                      component="div"
-                    />
-                  </div>
-
-                  <div className="form-row">
-                    <Field
-                      type="password"
-                      name="password"
-                      id="password"
-                      placeholder="Enter password"
-                      className={`inputfield ${
-                        errors.password && touched.password
-                          ? "input-error"
-                          : null
-                      }`}
-                    />
-                    <ErrorMessage
-                      component="div"
-                      className="errormsg"
-                      name="password"
-                    />
-                  </div>
-                  <div>
-                    <p className="text">
-                      Don't have an account?
-                      <span>
-                        <Link to="/signup" className="signuplink">
-                          Signup here
-                        </Link>
-                      </span>
-                    </p>
-                  </div>
-
-                  <Button type="submit" className="loginsubmit">
-                    Login
-                  </Button>
-                </div>
-              </Form>
+    <div className="login-container">
+      {error && <div className="error">{error}</div>}
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        <Form className="loginform">
+          <div className="loginheading">
+            <p>Login</p>
+          </div>
+          <hr />
+          <div className="loginbody">
+            <div className="form-group">
+              <label htmlFor="username">Username</label>
+              <Field
+                className="inputfield"
+                type="text"
+                id="username"
+                name="username"
+              />
+              <ErrorMessage
+                name="username"
+                component="div"
+                className="errormsg"
+              />
             </div>
-          </>
-        );
-      }}
-    </Formik>
+
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <Field
+                className="inputfield"
+                type="password"
+                id="password"
+                name="password"
+              />
+              <ErrorMessage
+                name="password"
+                component="div"
+                className="errormsg"
+              />
+            </div>
+            <div>
+              <p className="text">
+                Don't have an account?
+                <span>
+                  <Link to="/signup" className="signuplink">
+                    Signup here
+                  </Link>
+                </span>
+              </p>
+            </div>
+            <button className="loginsubmit" type="submit" disabled={isLoading}>
+              {isLoading ? "Logging in..." : "Login"}
+            </button>
+          </div>
+        </Form>
+      </Formik>
+    </div>
   );
 }
 

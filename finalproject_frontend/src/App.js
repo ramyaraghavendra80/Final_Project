@@ -1,59 +1,63 @@
-import logo from "./logo.svg";
-import "./App.css";
 import React, { useState } from "react";
+import { BrowserRouter, Routes, Route} from "react-router-dom";
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./Components/Login/Login";
 import Signup from "./Components/Signup/Signup";
 import Navbar from "./Components/Navbar/Navbar";
 import Home from "./Components/Home/Home";
-import MovieSearch from "./Components/Moviesearch/Moviesearch";
 import MovieDetail from "./Components/Moviedetail/Moviedetail";
-import BookingTicket from "./Components/BookingTicket/BookingTicket";
-import SeatSelection from "./Components/Seatselection/Seatselection";
+import SeatBooking from "./Components/SeatBooking/SeatBooking";
 import ForgotPassword from "./Components/Forgotpassword/Forgotpassword";
-import TicketPage from "./Components/Ticket/Ticket";
+import Ticket from "./Components/Ticket/Ticket";
+import TicketList from "./Components/Ticketlist/Ticketlist";
+
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    localStorage.getItem("accessToken") ? true : false
+  );
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("/api/logout", {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer YOUR_AUTH_TOKEN", // Add authorization header if needed
-        },
-      });
+      const accessToken = localStorage.getItem("accessToken");
 
-      if (response.ok) {
-        localStorage.removeItem("authToken");
-        setIsAuthenticated(false); // Update isAuthenticated state
-      } else {
-        // Handle logout error
-        console.error("Logout failed");
+      if (accessToken) {
+        const response = await fetch(`http://127.0.0.1:8000/project/logout/`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (response.ok) {
+          localStorage.removeItem("accessToken");
+          setIsAuthenticated(false);
+          window.location.href = "/login";
+        } else {
+          console.error("Logout failed");
+        }
       }
     } catch (error) {
       console.error("An error occurred during logout:", error);
     }
   };
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
   return (
     <div className="App">
       <BrowserRouter>
-      <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />
-      <Routes>
-          <Route exact path="/moviesearch" element={<MovieSearch />} />
-          <Route path="/movie/:id" element={<MovieDetail />} />
-          <Route path="/movie/:id/booking" element={<BookingTicket />} />
-          <Route
-            path="/movie/:id/booking/seat-selection"
-            element={<SeatSelection />}
-          />
+        <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />
+        <Routes>
+          <Route path="/movies/:id/" element={<MovieDetail />} />
+          <Route path="/movie/:id/seats/" element={<SeatBooking/>}/>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
-          <Route path="/ticket" element={<TicketPage />} />
-
+          <Route path="/ticket/:id/" element={<Ticket />} />
+          <Route path="/tickets" element={<TicketList />} />
       </Routes>
       </BrowserRouter>
     </div>

@@ -1,119 +1,94 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from "react";
+import "./Moviefilter.css";
 
-const MovieFilter = () => {
-  const [movies, setMovies] = useState([]);
-  const [filteredMovies, setFilteredMovies] = useState([]);
-  const [selectedGenres, setSelectedGenres] = useState([]);
-  const [selectedLanguages, setSelectedLanguages] = useState([]);
-  const [selectedRatings, setSelectedRatings] = useState([]);
+const MovieFilter = ({ setMovies }) => {
+  const genres = ["Action", "Comedy", "Drama", "Horror", "Science Fiction"];
+  const languages = ["English", "Spanish", "German", "French", "Japanese"];
+  const locations = ["New York","Los Angeles","Chicago","San Francisco","Miami"];
+  const ratings = ["G", "PG", "PG-13", "R"];
 
-  useEffect(() => {
-    // Fetch the list of movies from an API endpoint
-    fetch('your_movie_api_endpoint')
-      .then(response => response.json())
-      .then(data => {
+  const [selectedGenre, setSelectedGenre] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedRating, setSelectedRating] = useState("");
+  const accessToken = localStorage.getItem("accessToken");
+
+  const handleFilterMovies = () => {
+    // Fetch movies based on selected filters
+    fetch(
+      `http://127.0.0.1:8000/project/movies/?genre=${selectedGenre}&language=${selectedLanguage}&location=${selectedLocation}&rating=${selectedRating}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },} )
+      .then((response) => response.json())
+      .then((data) => {
         setMovies(data);
-        setFilteredMovies(data);
       })
-      .catch(error => console.error('Error fetching movies:', error));
-  }, []);
-
-  useEffect(() => {
-    // Apply filters to the list of movies
-    const filtered = movies.filter(movie => {
-      const matchesGenre = selectedGenres.length === 0 || selectedGenres.includes(movie.genre);
-      const matchesLanguage = selectedLanguages.length === 0 || selectedLanguages.includes(movie.language);
-      const matchesRating = selectedRatings.length === 0 || selectedRatings.includes(movie.rating);
-      return matchesGenre && matchesLanguage && matchesRating;
-    });
-    setFilteredMovies(filtered);
-  }, [selectedGenres, selectedLanguages, selectedRatings, movies]);
-
-  const handleGenreChange = event => {
-    const value = event.target.value;
-    setSelectedGenres(prevSelected => {
-      if (prevSelected.includes(value)) {
-        return prevSelected.filter(genre => genre !== value);
-      } else {
-        return [...prevSelected, value];
-      }
-    });
-  };
-
-  const handleLanguageChange = event => {
-    const value = event.target.value;
-    setSelectedLanguages(prevSelected => {
-      if (prevSelected.includes(value)) {
-        return prevSelected.filter(language => language !== value);
-      } else {
-        return [...prevSelected, value];
-      }
-    });
-  };
-
-  const handleRatingChange = event => {
-    const value = event.target.value;
-    setSelectedRatings(prevSelected => {
-      if (prevSelected.includes(value)) {
-        return prevSelected.filter(rating => rating !== value);
-      } else {
-        return [...prevSelected, value];
-      }
-    });
+      .catch((error) => {
+        console.error("Error fetching filtered movies:", error);
+      });
   };
 
   return (
-    <div>
-      <h1>Movie Filtering</h1>
-      <div>
-        <h2>Genres</h2>
-        {['Comedy', 'Horror', 'Action', 'Drama', 'Science Fiction'].map(genre => (
-          <label key={genre}>
-            <input
-              type="checkbox"
-              value={genre}
-              checked={selectedGenres.includes(genre)}
-              onChange={handleGenreChange}
-            />
-            {genre}
-          </label>
-        ))}
-      </div>
-      <div>
-        <h2>Languages</h2>
-        {['English', 'Spanish', 'German', 'French', 'Italian'].map(language => (
-          <label key={language}>
-            <input
-              type="checkbox"
-              value={language}
-              checked={selectedLanguages.includes(language)}
-              onChange={handleLanguageChange}
-            />
-            {language}
-          </label>
-        ))}
-      </div>
-      <div>
-        <h2>Ratings</h2>
-        {['PG', 'PG-13', 'R', 'NC-17'].map(rating => (
-          <label key={rating}>
-            <input
-              type="checkbox"
-              value={rating}
-              checked={selectedRatings.includes(rating)}
-              onChange={handleRatingChange}
-            />
-            {rating}
-          </label>
-        ))}
-      </div>
-      <div>
-        <h2>Filtered Movies</h2>
-        <ul>
-          {filteredMovies.map(movie => (
-            <li key={movie.id}>{movie.title}</li>
-          ))}
-        </ul>
+    <div className="movie-filter">
+      <div className="filter-row">
+        <div className="filter-options">
+          <label>Genre:</label>
+          <select
+            value={selectedGenre}
+            onChange={(e) => setSelectedGenre(e.target.value)}
+          >
+            <option value="">Select Genre</option>
+            {genres.map((genre, i) => (
+              <option key={i} value={genre}>
+                {genre}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="filter-options">
+          <label>Language:</label>
+          <select
+            value={selectedLanguage}
+            onChange={(e) => setSelectedLanguage(e.target.value)}
+          >
+            <option value="">Select Language</option>
+            {languages.map((language, i) => (
+              <option key={i} value={language}>
+                {language}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="filter-options">
+          <label>Location:</label>
+          <select
+            value={selectedLocation}
+            onChange={(e) => setSelectedLocation(e.target.value)}
+          >
+            <option value="">Select Location</option>
+            {locations.map((location, i) => (
+              <option key={i} value={location}>
+                {location}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="filter-options">
+          <label>Rating:</label>
+          <select
+            value={selectedRating}
+            onChange={(e) => setSelectedRating(e.target.value)}
+          >
+            <option value="">Select Rating</option>
+            {ratings.map((rating, i) => (
+              <option key={i} value={rating}>
+                {rating}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button onClick={handleFilterMovies}>Apply Filters</button>
       </div>
     </div>
   );

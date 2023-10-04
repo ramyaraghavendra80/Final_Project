@@ -38,7 +38,7 @@ class Theater(models.Model):
     address = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     pincode = models.CharField(max_length=255)
-    movie_timing = models.DateField()
+    # movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -52,7 +52,7 @@ class Movie(models.Model):
     director = models.CharField(max_length=255)
     movie_length = models.PositiveIntegerField()
     year = models.DateField(default=datetime.date.today)
-    theater = models.ForeignKey(Theater, on_delete=models.CASCADE,blank=True,null=True,related_name='movies')
+    theater = models.ManyToManyField(Theater, related_name='movies')
 
     def __str__(self):
         return self.title
@@ -84,13 +84,14 @@ class Seat(models.Model):
             raise ValidationError({'seat_number': _('Seat already exists for this movie, theater, date, and time.')})
 
 class Booking(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Associate with a user
-    seat_numbers = models.CharField(max_length=255)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,related_name='bookings')  # Associate with a user
+    seat_number = models.CharField(max_length=255)
     date = models.DateField()
     time = models.TimeField()
-    movie_name = models.CharField(max_length=255)
-    theater_name = models.CharField(max_length=255)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    movie = models.CharField(max_length=255)
+    theater = models.ForeignKey(Theater, on_delete=models.CASCADE, default=None)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    category = models.CharField(max_length=20,default=None)  # Category of the seat (e.g., "Standard", "VIP", "Balcony")
 
 class Ticket(models.Model):
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
@@ -101,13 +102,15 @@ class Ticket(models.Model):
     theater_name = models.CharField(max_length=255)
     total_price = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tickets')
+    category = models.CharField(max_length=20,default=None)  # Category of the seat (e.g., "Standard", "VIP", "Balcony")
 
     def save(self, *args, **kwargs):
         # Automatically populate ticket fields from the associated booking
         self.date = self.booking.date
         self.time = self.booking.time
-        self.movie_name = self.booking.movie_name
-        self.theater_name = self.booking.theater_name
-        self.total_price = self.booking.total_price
-        self.seat_number = self.booking.seat_numbers
+        self.movie_name = self.booking.movie
+        self.theater_name = self.booking.theater
+        self.total_price = self.booking.price
+        self.seat_number = self.booking.seat_number
+        self.category = self.booking.category
         super().save(*args, **kwargs)

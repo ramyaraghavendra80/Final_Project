@@ -1,0 +1,25 @@
+.ticketform{
+    height: 450px;
+  width: 350px;
+  box-sizing: border-box;
+  box-shadow: 3px 2px 7px rgb(74, 119, 241);
+  margin: 20px;
+  border: 1px solid #afdbf3;
+  padding: 10px;
+  transition: box-shadow 0.3s ease; /* Add a smooth transition for the hover effect */
+  text-decoration: none;
+  margin-left: 26em;
+
+}
+.ticketheading{
+    margin: 10px !important;
+}
+.generatebutton{
+    background-color: rgb(179, 117, 236);
+    display: flex;
+    justify-content: center;
+    margin-left: 85px;
+}
+.ticketbody{
+    margin: 10px;
+}

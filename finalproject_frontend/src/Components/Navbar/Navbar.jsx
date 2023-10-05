@@ -22,9 +22,6 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
       </ul>
       <ul className="navbar-list-right">
         <li className="navbar-item">
-          <Link to="/tickets">Tickets</Link>
-        </li>
-        <li className="navbar-item">
           <Link to="/signup">SignUp</Link>
         </li>
       </ul>
@@ -33,3 +30,4 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
 };
 
 export default Navbar;
+

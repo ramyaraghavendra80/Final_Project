@@ -42,8 +42,8 @@ function TicketList() {
   }
 
   return (
-    <div>
-      <h2>Ticket List</h2>
+    <div className="ticketform" >
+      <h2 className="ticketheading">Ticket List</h2>
       <ul>
         {tickets.map((ticket) => (
           <li key={ticket.id}>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BrowserRouter, Routes, Route} from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "./Components/Login/Login";
 import Signup from "./Components/Signup/Signup";
@@ -9,7 +9,6 @@ import MovieDetail from "./Components/Moviedetail/Moviedetail";
 import SeatBooking from "./Components/SeatBooking/SeatBooking";
 import ForgotPassword from "./Components/Forgotpassword/Forgotpassword";
 import Ticket from "./Components/Ticket/Ticket";
-import TicketList from "./Components/Ticketlist/Ticketlist";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -51,14 +50,13 @@ function App() {
         <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />
         <Routes>
           <Route path="/movies/:id/" element={<MovieDetail />} />
-          <Route path="/movie/:id/seats/" element={<SeatBooking/>}/>
+          <Route path="/movie/:id/seats/" element={<SeatBooking />} />
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
           <Route path="/ticket/:id/" element={<Ticket />} />
-          <Route path="/tickets" element={<TicketList />} />
-      </Routes>
+        </Routes>
       </BrowserRouter>
     </div>
   );

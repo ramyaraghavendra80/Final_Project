@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
+import "./SeatBooking.css";
 
 function SeatBooking() {
   const { id } = useParams();
@@ -261,8 +262,8 @@ function SeatBooking() {
   const seatColumns = ["1", "2", "3", "4", "5"];
 
   return (
-    <div>
-      <h2>Seat Booking</h2>
+    <div className="seatform">
+      <h2 className="seat-heading">Seat Booking</h2>
       {isBookingSuccessful ? (
         <div className="confirmation-message">
           <p>Booking successful! Your booking ID is: {bookingId}</p>
@@ -280,15 +281,17 @@ function SeatBooking() {
           <p>Theater Address: {formData.theaterAddress}</p>
           <p>Selected Seats: {selectedSeats.join(", ")}</p>
           <p>Total Price: {formData.price} Rs</p>
+          <p>category: {formData.category}</p>
           <p>User: {username}</p>
-          <button onClick={handleConfirmBooking}>Confirm</button>
-          <button onClick={() => setIsConfirmationModalOpen(false)}>
+          <button className="modalbutton" onClick={handleConfirmBooking}>Confirm</button>
+          <button className="modalbutton" onClick={() => setIsConfirmationModalOpen(false)}>
             Cancel
           </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit}>
-          <div>
+        <form onSubmit={handleSubmit} >
+          <div className="select-row" >
+            <div>
             <label htmlFor="theaterName">Theater Name:</label>
             <select
               id="theaterName"
@@ -358,6 +361,8 @@ function SeatBooking() {
               <option value="02:00:00">02:00:00</option>
             </select>
           </div>
+          </div>
+          <hr/>
           <div className="seat-map">
             {seatRows.map((row) => (
               <div key={row} className="seat-row">

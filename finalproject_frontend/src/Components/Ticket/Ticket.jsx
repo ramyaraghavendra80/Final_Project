@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import jsPDF from "jspdf";
+import "./Ticket.css";
 
 function Ticket() {
   const { id } = useParams();
@@ -40,9 +41,7 @@ function Ticket() {
       } // Use 'N/A' as a fallback for null
       Movie Name: ${bookingData.movie}
       Theater ID: ${bookingData.theater}
-      Seat Number(s): ${JSON.parse(bookingData.seat_number).join(
-        ", "
-      )} // Parse seat_number as JSON
+      Seat Number(s): ${bookingData.seat_number.split(", ").join(", ")} // Parse seat_number as JSON
       Price: ${parseFloat(bookingData.price).toFixed(
         2
       )} Rs // Parse and format the price
@@ -65,14 +64,14 @@ function Ticket() {
       if (bookingData) {
         // Create an object with the correct property names for the POST request
         const ticketDataToSave = {
-          booking:bookingData.id,
+          booking: bookingData.id,
           movie_name: bookingData.movie,
           category: bookingData.category || "N/A", // Use 'N/A' as a fallback for null
           theater_name: `Theater ${bookingData.theater}`,
           seat_numbers: bookingData.seat_number.split(", ").join(", "), // Parse seat_number as JSON
           total_price: parseFloat(bookingData.price).toFixed(2),
           date: bookingData.date,
-          time: bookingData.time
+          time: bookingData.time,
         };
 
         // Send a POST request to save the ticket data
@@ -102,9 +101,10 @@ function Ticket() {
   }
 
   return (
-    <div className="ticket">
-      <h2>Ticket Details</h2>
-      <div>
+    <div className="ticketform">
+      <h2 className="ticketheading" >Ticket Details</h2>
+      <hr/>
+      <div className="ticketbody">
         <p>Booking ID: {bookingData.id}</p>
         <p>Category: {bookingData.category}</p>
         <p>Movie Name: {bookingData.movie}</p>
@@ -120,7 +120,7 @@ function Ticket() {
           </div>
         ) : (
           <div>
-            <button onClick={saveTicketData}>Generate & Save Ticket</button>
+            <button className="generatebutton" onClick={saveTicketData}>Generate & Save Ticket</button>
           </div>
         )}
       </div>

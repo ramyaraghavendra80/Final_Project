@@ -21,6 +21,9 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
         </li>
       </ul>
       <ul className="navbar-list-right">
+      {/* <li className="navbar-item">
+          <Link to="/userprofile">profile</Link>
+        </li> */}
         <li className="navbar-item">
           <Link to="/signup">SignUp</Link>
         </li>

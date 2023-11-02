@@ -9,7 +9,7 @@ import MovieDetail from "./Components/Moviedetail/Moviedetail";
 import SeatBooking from "./Components/SeatBooking/SeatBooking";
 import ForgotPassword from "./Components/Forgotpassword/Forgotpassword";
 import Ticket from "./Components/Ticket/Ticket";
-// import UserProfile from "./Components/UserProfile/UserProfile";
+import UserProfile from "./Components/UserProfile/UserProfile";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -57,7 +57,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
           <Route path="/ticket/:id/" element={<Ticket />} />
-          {/* <Route path="/userprofile" element={<UserProfile />} /> */}
+          <Route path="/userprofile" element={<UserProfile />} />
         </Routes>
       </BrowserRouter>
     </div>

@@ -126,7 +126,7 @@
     color: #fff;
   }
   
-  .confirmation-modal {
+  /* .confirmation-modal {
     border: 1px solid #ccc;
     padding: 20px;
     border-radius: 5px;
@@ -135,7 +135,7 @@
     text-align: center;
     max-width: 400px;
     margin: 0 auto;
-  }
+  } */
   
   .modalbutton {
     margin: 10px;

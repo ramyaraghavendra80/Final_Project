@@ -157,12 +157,12 @@ function SeatBooking() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (selectedSeats.length === 0) {
       alert("Please select at least one seat.");
       return;
     }
-
+  
     // Prepare the data to be sent to the server
     const requestData = {
       seat_number: selectedSeats,
@@ -171,7 +171,7 @@ function SeatBooking() {
       time: formData.time,
       theater: formData.theaterId,
     };
-
+  
     try {
       // Send a POST request to book the selected seats
       const response = await fetch(
@@ -185,14 +185,15 @@ function SeatBooking() {
           body: JSON.stringify(requestData),
         }
       );
-
+  
       if (response.ok) {
         // Booking was successful
         const data = await response.json();
         setBookingId(data.booking_id);
         setTotalPrice(data.total_price);
-        setIsBookingSuccessful(true);
         setIsConfirmationModalOpen(true);
+
+        // setIsBookingSuccessful(true);
       } else {
         alert("Seat is already booked...!", response.statusText);
       }
@@ -200,7 +201,7 @@ function SeatBooking() {
       alert("Booking failed:", error.message);
     }
   };
-
+  
   const handleConfirmBooking = async () => {
     try {
       if (selectedSeats.length === 0) {
@@ -209,7 +210,6 @@ function SeatBooking() {
       }
 
       const totalPrice = calculateTotalPrice();
-      setIsConfirmationModalOpen(true);
       setFormData({ ...formData, price: totalPrice });
 
       const bookingData = {
@@ -239,8 +239,7 @@ function SeatBooking() {
         const data = await response.json();
         const { booking_id, total_price } = data;
         setBookingId(booking_id);
-        setTotalPrice(total_price);
-        setIsBookingSuccessful(true);
+        setIsBookingSuccessful(true); // Set isBookingSuccessful to true here
         setIsConfirmationModalOpen(true);
       } else {
         alert("Booking failed:", response.statusText);
@@ -249,7 +248,7 @@ function SeatBooking() {
       alert("Booking failed:", error.message);
     }
   };
-
+  
   const isSeatAvailable = (seatNumber) =>
     availableSeats && availableSeats.includes(seatNumber);
 
@@ -271,7 +270,7 @@ function SeatBooking() {
             <button>Generate Ticket</button>
           </Link>
         </div>
-      ) : isConfirmationModalOpen ? (
+      ) :  isConfirmationModalOpen ? (
         <div className="confirmation-modal">
           <h3>Confirm Booking</h3>
           <p>Date: {formData.date}</p>

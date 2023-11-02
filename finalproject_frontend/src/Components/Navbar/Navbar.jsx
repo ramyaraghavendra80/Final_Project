@@ -14,16 +14,18 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
         </li>
         <li className="navbar-item">
           {isAuthenticated ? (
-            <button className="logout" onClick={onLogout}>Logout</button>
+            <button className="logout" onClick={onLogout}>
+              Logout
+            </button>
           ) : (
             <Link to="/login">Login</Link>
           )}
         </li>
       </ul>
       <ul className="navbar-list-right">
-      {/* <li className="navbar-item">
+        <li className="navbar-item">
           <Link to="/userprofile">profile</Link>
-        </li> */}
+        </li>
         <li className="navbar-item">
           <Link to="/signup">SignUp</Link>
         </li>
@@ -33,4 +35,3 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
 };
 
 export default Navbar;
-
